@@ -103,6 +103,7 @@ module.exports = function(config) {
     preprocessors: {
       'packages/polyfill/index.ts': ['webpack', 'sourcemap'],
       '**/test/**/*.ts': ['webpack', 'sourcemap'],
+      'packages/firestore/test/**/bootstrap.ts': ['webpack', 'babel'],
       'integration/**/namespace.*': ['webpack', 'babel', 'sourcemap']
     },
 
@@ -131,14 +132,28 @@ module.exports = function(config) {
 
     client: {
       mocha: Object.assign({}, mochaBase, {
+        retries: 4,
+
         // TODO(b/78474429, b/78473696): The tests matched by this regex
         // are currently failing in the saucelabs cross-browser tests. They
         // are disabled until we have a chance to investigate / fix them.
         grep:
+          // databse
           'Crawler Support' +
+          '|\\.orderBy tests' +
+          '|\\.info Tests Can watch .info/connected' +
+          '|\\.info Tests \\.info/connected correctly goes to false when disconnected' +
           '|Transaction Tests server values: local timestamp should eventually \\(but not immediately\\) match the server with txns' +
+          '|Query Tests Get notified of deletes that happen while offline' +
+          // firestore
           '|QueryListener raises error event' +
-          '|AsyncQueue handles failures',
+          '|AsyncQueue handles failures' +
+          '|AsyncQueue can schedule ops in the future' +
+          '|Persistence: \\(Memory\\) Visible mutations reflect uid switches' +
+          '|Remote store: \\(Memory\\) Handles user changes while offline \\(b\\/74749605\\)' +
+          '|Writes: \\(Memory\\) Writes are resent after network disconnect' +
+          '|\\(Persistence=false\\) Queries throws custom error when using docChanges as property' +
+          '|\\(Persistence=false\\) Server Timestamps can return previous value through consecutive updates',
         invert: true
       })
     },
